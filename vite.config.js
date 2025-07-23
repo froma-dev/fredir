@@ -11,6 +11,7 @@ export default defineConfig(({ command, mode, ssrBuild }) => {
       mainFields: ['browser', 'module', 'jsnext:main', 'jsnext'],
     },
     server: {
+      allowedHosts: ['local.me.dev', 'fromana.dev'],
       headers: {
         'Cross-Origin-Opener-Policy': 'same-origin',
         'Cross-Origin-Embedder-Policy': 'require-corp',

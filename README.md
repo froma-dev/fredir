@@ -41,6 +41,15 @@ npm run build
 
 This will create a production version of the app in the `dist` folder.
 
+## Caveats
+### Blocked request
+When using local DNS such as ```local.me.dev:5173``` you will get a blocked request error.
+```sh
+Blocked request. This host("local.me.dev") is not allowed. To allow this host, add "local.me.dev" to server.allowedHosts in vite.config.js
+```
+
+
+
 
 ### Resources
 

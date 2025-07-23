@@ -1,25 +1,14 @@
 import Blits from '@lightningjs/blits'
 import App from './App'
+import config from './config'
+import { appState } from '@lightningjs/blits/plugins'
+import { ScreenResolutions } from './utils/screenResolutions'
 
-Blits.Launch(App, 'app', {
-  w: 1920,
-  h: 1080,
-  debugLevel: 1,
-  fonts: [
-    {
-      family: 'lato',
-      type: 'msdf',
-      file: 'fonts/Lato-Regular.ttf',
-    },
-    {
-      family: 'raleway',
-      type: 'msdf',
-      file: 'fonts/Raleway-ExtraBold.ttf',
-    },
-    {
-      family: 'opensans',
-      type: 'web',
-      file: 'fonts/OpenSans-Medium.ttf',
-    },
-  ],
+const {w = 1920, h = 1080} = config
+const screenRes = w < ScreenResolutions.HD.width ? ScreenResolutions.HD : ScreenResolutions.FULL_HD
+console.log(w, h, screenRes)
+Blits.Plugin(appState, {
+    w,h,
+    screenRes
 })
+Blits.Launch(App, 'app', config)

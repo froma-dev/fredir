@@ -3,6 +3,8 @@ import Carousel from '../components/Carousel'
 import Loader from '../components/Loader'
 import colors from '../utils/colors'
 import Header from '../components/Header/Header'
+import Grid from '../components/Grid/Grid'
+import Zap from '../components/Zap/Zap'
 import { fetchRedirections, type RedirectionItem } from '../services/redirs'
 
 export default Blits.Component('Home', {
@@ -10,6 +12,8 @@ export default Blits.Component('Home', {
     Loader,
     Carousel,
     Header,
+    Grid,
+    Zap
   },
   template: `
     <Element :w="$$appState.w" :h="$$appState.h" color="$backgroundColor">
@@ -17,9 +21,19 @@ export default Blits.Component('Home', {
       <Element :y.transition="$y">
         <Loader :x="$$appState.w / 2" mount="{x: 0.5}" y="600" w="160" :alpha.transition="$loaderAlpha" />
         <Element y="200" :alpha.transition="$textAlpha">
-          <Carousel ref="carousel" :items="$items" title="Redirects" />
+          <!--<Carousel ref="carousel" :items="$items" title="Redirects" />-->
+          <Grid ref="grid"
+            :items="$items"
+            :focusIndex="$gridFocusIndex"
+            columns="4"
+            itemWidth="400"
+            itemHeight="180"
+            itemOffset="8"
+            isContinuous="true"
+          />
         </Element>
       </Element>
+      <Zap :alpha.transition="{value: $zapTo.length > 0 ? 1 : 0, duration: 500}" :zapTo="$zapTo" placement="center" y="100" />
     </Element>`,
   state() {
     return {
@@ -40,7 +54,10 @@ export default Blits.Component('Home', {
        */
       color: '' as string,
       items: [] as RedirectionItem[],
-      backgroundColor: colors.surface.dark
+      backgroundColor: colors.surface.dark,
+      zapTimeoutId: null as number | null,
+      zapTo: '' as string,
+      gridFocusIndex: 0
     }
   },
   hooks: {
@@ -48,7 +65,6 @@ export default Blits.Component('Home', {
 
     },
     ready() {
-
       this.loaderAlpha = 1
 
       this.$setTimeout(() => {
@@ -63,11 +79,7 @@ export default Blits.Component('Home', {
         this.textAlpha = 1
       }, 500)
 
-      this.loadItems().then(() => {
-        const focusItem = this.$select('carousel')
-
-        if (focusItem && focusItem.$focus) focusItem.$focus();
-      })
+      this.loadItems().then(() => this.focusGrid())
 
     },
   },
@@ -76,6 +88,46 @@ export default Blits.Component('Home', {
       const redirections = await fetchRedirections();
 
       this.items = redirections
+    },
+    focusGrid() {
+      const focusItem = this.$select('grid')
+      if (focusItem && focusItem.$focus) focusItem.$focus();
     }
   },
+  input: {
+    any(ev) {
+      console.log('Key pressed:', ev.key);
+
+      // Check if the key is a digit (0-9)
+      if (/^\d$/.test(ev.key)) {
+        const zapToDigit = parseInt(ev.key, 10);
+
+        if (this.zapTimeoutId) {
+          this.$clearTimeout(this.zapTimeoutId)
+        }
+
+        this.zapTimeoutId = this.$setTimeout(() => {
+          console.log('timeout zap!')
+          const zapToIndex = this.zapTo === '0' ? 0 : parseInt(this.zapTo) - 1;
+          this.gridFocusIndex = zapToIndex;
+          console.log('GRID FOCUS INDEX ', this.gridFocusIndex)
+          this.zapTimeoutId = null;
+          this.zapTo = '';
+          this.focusGrid();
+        }, 4000)
+
+        if (this.zapTo.length === 4) {
+          this.zapTo = ''
+        }
+
+        this.zapTo += `${zapToDigit}`
+        console.log('...', this.zapTo)
+        console.log(`Numeric key ${zapToDigit} was pressed`);
+
+        // You can now use the digit variable which will be a number from 0-9
+        // For example, to focus a specific item in your grid:
+        // this.$select('grid').$setFocus(digit - 1); // Convert to 0-based index if needed
+      }
+    }
+  }
 })

@@ -1,4 +1,3 @@
-
 import Blits from '@lightningjs/blits'
 import Item from '../CarouselItem'
 
@@ -8,6 +7,33 @@ interface GridState {
   gridColumns: number;
   _scrollY: number;
   _visibleRows: number;
+}
+
+interface GridComponentInstance extends ReturnType<typeof Blits.Component> {
+  $select: (ref: string) => { $focus: () => void } | null;
+  $trigger: (event: string) => void;
+  parent: { $focus: (e: any) => void };
+  $$appState: { w: number };
+  items: any[];
+  gridColumns: number;
+  _visibleRows: number;
+  itemWidth: number;
+  itemHeight: number;
+  itemOffset: number;
+  visibleRows?: number;
+  focusIndex?: number;
+  looping?: boolean;
+  refocusParent?: boolean;
+  isContinuous?: boolean;
+  _scrollY: number;
+  scrollY: number;
+  totalHeight: number;
+  focused: number;
+  scrollToFocusedItem: () => void;
+  gridWidth: number;
+  totalWidth: number;
+  containerHeight: number;
+  x: number;
 }
 
 interface GridProps {
@@ -20,9 +46,28 @@ interface GridProps {
   refocusParent?: boolean;
   isContinuous?: boolean;
   focusIndex?: number;
+  visibleRows?: number;
 }
 
-export default Blits.Component('Grid', {
+interface GridComputed {
+  readonly totalWidth: number;
+  readonly totalHeight: number;
+  readonly gridWidth: number;
+  readonly containerHeight: number;
+  readonly x: number;
+  readonly scrollY: number;
+}
+
+interface GridMethods {
+  scrollToFocusedItem(): void;
+}
+
+interface GridWatchers {
+  focusIndex?(): void;
+  focused?(value: number): void;
+}
+
+const Grid = Blits.Component('Grid', {
   components: {
     Item,
   },
@@ -35,12 +80,12 @@ export default Blits.Component('Grid', {
             :y="Math.floor($index / ($gridColumns)) * $totalHeight"
             :ref="'grid-item-'+$item.id"
             index="$index"
-            item="$item"
-            id="$item.id"
-            width="$itemWidth"
-            height="$itemHeight"
-            offset="$itemOffset"
-            key="$item.id"
+            :item="$item"
+            :id="$item.id"
+            :width="$itemWidth"
+            :height="$itemHeight"
+            :offset="$itemOffset"
+            :key="$item.id"
         />
       </Element>
     </Element>
@@ -56,12 +101,12 @@ export default Blits.Component('Grid', {
     'isContinuous',
     'focusIndex',
     'visibleRows'
-  ] as unknown as PropObject,
+  ] as const,
   state(): GridState {
     return {
       focused: this.focusIndex || 0,
       baseColumns: 4,
-      gridColumns: this.columns || this.baseColumns,
+      gridColumns: this.columns || 4,
       _scrollY: 0,
       _visibleRows: this.visibleRows || 4,
     }
@@ -74,15 +119,15 @@ export default Blits.Component('Grid', {
       return (this.itemHeight || 300) + (this.itemOffset || 0)
     },
     gridWidth(): number {
-      return (this.totalWidth * this.gridColumns)
+      return this.totalWidth * this.gridColumns
     },
     containerHeight(): number {
       return this.totalHeight * this._visibleRows
     },
-    x() {
+    x(): number {
       return ((this.$$appState.w - this.gridWidth) / 2)
     },
-    scrollY() {
+    scrollY(): number {
       return this._scrollY
     },
   },
@@ -104,35 +149,32 @@ export default Blits.Component('Grid', {
       const visibleRows = this._visibleRows;
       const currentFirstVisibleRow = Math.floor(this.scrollY / this.totalHeight);
 
-      // Calculate if focused item is outside visible area
       if (focusedRow < currentFirstVisibleRow) {
-        // Scroll up to show the focused item at the top
         this._scrollY = focusedRow * this.totalHeight;
       } else if (focusedRow >= currentFirstVisibleRow + visibleRows) {
-        // Scroll down to show the focused item at the bottom
         this._scrollY = (focusedRow - visibleRows + 1) * this.totalHeight;
       }
 
-      // Ensure we don't scroll past the content
       const maxScroll = Math.max(0, (Math.ceil(this.items.length / columns) - visibleRows) * this.totalHeight);
       this._scrollY = Math.min(maxScroll, Math.max(0, this._scrollY));
     },
   },
   watch: {
     focusIndex() {
-      this.focused = this.focusIndex
+      this.focused = this.focusIndex || 0;
       this.$trigger('focused')
     },
     focused(value: number) {
+      if (!this.items[value]) return;
       const focusItem = this.$select(`grid-item-${this.items[value].id}`)
-      if (focusItem && focusItem.$focus) {
+      if (focusItem?.$focus) {
         focusItem.$focus()
         this.scrollToFocusedItem()
       }
     },
   },
   input: {
-    up(e) {
+    up(e: any) {
       const columns = this.gridColumns
       const previousIndex = this.focused - columns
 
@@ -146,7 +188,7 @@ export default Blits.Component('Grid', {
         this.parent.$focus(e)
       }
     },
-    down(e) {
+    down(e: any) {
       const columns = this.gridColumns
       const nextIndex = this.focused + columns
 
@@ -158,7 +200,7 @@ export default Blits.Component('Grid', {
         this.parent.$focus(e)
       }
     },
-    left(e) {
+    left(e: any) {
       const columns = this.gridColumns
       const isNotFirstInRow = this.focused % columns > 0
       const isWithinBounds = this.focused + columns - 1 < this.items.length
@@ -174,7 +216,7 @@ export default Blits.Component('Grid', {
         this.parent.$focus(e)
       }
     },
-    right(e) {
+    right(e: any) {
       const columns = this.gridColumns
       const isNotLastInRow = this.focused % columns < columns - 1
       const isNotLastItem = this.focused < this.items.length - 1
@@ -195,3 +237,5 @@ export default Blits.Component('Grid', {
     },
   },
 })
+
+export default Grid as unknown as ReturnType<typeof Blits.Component>

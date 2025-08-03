@@ -1,5 +1,5 @@
-import Blits from "@lightningjs/blits";
-import colors from "../utils/colors";
+import Blits from '@lightningjs/blits';
+import colors from '../utils/colors';
 
 interface MarqueeProps {
   speed?: number; // pixels per second
@@ -7,7 +7,7 @@ interface MarqueeProps {
   enabled?: boolean; // whether marquee is enabled
 }
 
-export default Blits.Component("CarouselItem", {
+export default Blits.Component('CarouselItem', {
   template: `
   <Element
   w="$glowWidth"
@@ -61,7 +61,7 @@ export default Blits.Component("CarouselItem", {
     </Element>
   </Element>
   `,
-  props: ["item", "index", "id", "width", "height", "offset", "marqueeConfig"],
+  props: ['item', 'index', 'id', 'width', 'height', 'offset', 'marqueeConfig'],
   state() {
     return {
       backgroundColor: colors.surface.elevated,
@@ -80,24 +80,24 @@ export default Blits.Component("CarouselItem", {
         speed: 80, // pixels per second
         delay: 1000, // 2 seconds before starting
         enabled: true,
-        ...(this.marqueeConfig || {}) // Merge with provided config if any
+        ...(this.marqueeConfig || {}), // Merge with provided config if any
       },
       textX: 0,
       textWidth: 0,
       isScrolling: false,
       scrollDirection: -1,
       scrollPosition: 0,
-      containerWidth: 360 // Default maxwidth from the Text element
+      containerWidth: 360, // Default maxwidth from the Text element
     };
   },
   methods: {
-    onNumberTextLoaded ({w}: {w: number}) {
+    onNumberTextLoaded({ w }: { w: number }) {
       this.numberWidth = w;
     },
-    onTitleLoaded({w}: {w: number}) {
+    onTitleLoaded({ w }: { w: number }) {
       this.titleWidth = w;
     },
-    onUrlLoaded({w}: {w: number}) {
+    onUrlLoaded({ w }: { w: number }) {
       this.textWidth = w;
     },
     startMarquee() {
@@ -115,6 +115,10 @@ export default Blits.Component("CarouselItem", {
         this.animateMarquee();
       }, this.marquee.delay);
     },
+    stopMarquee() {
+      this.resetMarquee(true);
+      this.isScrolling = false;
+    },
     animateMarquee() {
       if (!this.isScrolling) return;
 
@@ -123,29 +127,35 @@ export default Blits.Component("CarouselItem", {
       const maxScroll = textWidth - containerWidth + this.offset;
 
       // Update scroll position based on speed and time
-      const delta = (this.marquee.speed / 60); // 60fps
+      const delta = this.marquee.speed / 60; // 60fps
       this.scrollPosition -= delta;
 
       // If we've scrolled past the end, reset to start
       if (this.scrollPosition < -maxScroll) {
-        this.scrollPosition = 0;
+        this.resetMarquee();
+      } else {
+        this.textX = this.scrollPosition;
+        requestAnimationFrame(this.animateMarquee.bind(this));
+      }
+    },
+    resetMarquee(shouldResetImmediately: boolean = false) {
+      this.scrollPosition = 0;
 
-        if (this.marqueeTimeoutId) {
-          this.$clearTimeout(this.marqueeTimeoutId);
-        }
+      if (this.marqueeTimeoutId) {
+        this.$clearTimeout(this.marqueeTimeoutId);
+      }
 
+      if (shouldResetImmediately) {
+        this.textX = 0;
+      } else {
         // Small delay before starting the next scroll
         this.marqueeTimeoutId = this.$setTimeout(() => {
           if (this.isScrolling) {
             requestAnimationFrame(this.animateMarquee.bind(this));
           }
         }, this.marquee.delay);
-        return;
       }
-
-      this.textX = this.scrollPosition;
-      requestAnimationFrame(this.animateMarquee.bind(this));
-    }
+    },
   },
   hooks: {
     ready() {
@@ -162,7 +172,7 @@ export default Blits.Component("CarouselItem", {
     },
     unfocus() {
       // Pause marquee when unfocused
-      this.isScrolling = false;
+      this.stopMarquee();
     },
   },
   input: {

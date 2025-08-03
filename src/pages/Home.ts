@@ -20,18 +20,18 @@ export default Blits.Component('Home', {
     <Header brand="assets/thunda.svg" title="fRedir - Smart Redirects" />
       <Element :y.transition="$y">
         <Loader :x="$$appState.w / 2" mount="{x: 0.5}" y="600" w="160" :alpha.transition="$loaderAlpha" />
-        <Element y="200" :alpha.transition="$textAlpha">
           <!--<Carousel ref="carousel" :items="$items" title="Redirects" />-->
           <Grid ref="grid"
             :items="$items"
             :focusIndex="$gridFocusIndex"
+            :alpha.transition="$textAlpha"
             columns="4"
+            y="200"
             itemWidth="400"
             itemHeight="180"
             itemOffset="8"
             isContinuous="true"
           />
-        </Element>
       </Element>
       <Zap :alpha.transition="{value: $zapTo.length > 0 ? 1 : 0, duration: 500}" :zapTo="$zapTo" placement="center" y="100" />
     </Element>`,

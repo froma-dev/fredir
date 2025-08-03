@@ -72,7 +72,7 @@ const Grid = Blits.Component('Grid', {
     Item,
   },
   template: `
-    <Element x="$x" h="$containerHeight" clip="true">
+    <Element x="$x" w="$gridWidth" h="$containerHeight" clipping="true">
       <Element :y.transition="{value: -$scrollY, duration: 350}">
         <Item
           :for="(item, index) in $items"
@@ -122,7 +122,7 @@ const Grid = Blits.Component('Grid', {
       return this.totalWidth * this.gridColumns;
     },
     containerHeight(): number {
-      return this.totalHeight * this._visibleRows;
+      return this.totalHeight * (this._visibleRows + 1);
     },
     x(): number {
       return (this.$$appState.w - this.gridWidth) / 2;
@@ -237,6 +237,9 @@ const Grid = Blits.Component('Grid', {
     },
     enter() {
       console.log('Selected item:', this.items[this.focused]);
+    },
+    back(e) {
+      console.log('on back', e);
     },
   },
 });

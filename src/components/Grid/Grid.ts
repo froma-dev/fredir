@@ -1,5 +1,5 @@
-import Blits from '@lightningjs/blits'
-import Item from '../CarouselItem'
+import Blits from '@lightningjs/blits';
+import Item from '../CarouselItem';
 
 interface GridState {
   focused: number;
@@ -100,7 +100,7 @@ const Grid = Blits.Component('Grid', {
     'refocusParent',
     'isContinuous',
     'focusIndex',
-    'visibleRows'
+    'visibleRows',
   ] as const,
   state(): GridState {
     return {
@@ -109,37 +109,37 @@ const Grid = Blits.Component('Grid', {
       gridColumns: this.columns || 4,
       _scrollY: 0,
       _visibleRows: this.visibleRows || 4,
-    }
+    };
   },
   computed: {
     totalWidth(): number {
-      return (this.itemWidth || 300) + (this.itemOffset || 0)
+      return (this.itemWidth || 300) + (this.itemOffset || 0);
     },
     totalHeight(): number {
-      return (this.itemHeight || 300) + (this.itemOffset || 0)
+      return (this.itemHeight || 300) + (this.itemOffset || 0);
     },
     gridWidth(): number {
-      return this.totalWidth * this.gridColumns
+      return this.totalWidth * this.gridColumns;
     },
     containerHeight(): number {
-      return this.totalHeight * this._visibleRows
+      return this.totalHeight * this._visibleRows;
     },
     x(): number {
-      return ((this.$$appState.w - this.gridWidth) / 2)
+      return (this.$$appState.w - this.gridWidth) / 2;
     },
     scrollY(): number {
-      return this._scrollY
+      return this._scrollY;
     },
   },
   hooks: {
     ready() {
       if (this.isContinuous && this.looping) {
-        throw new Error('Grid behaviour with looping and isContinuous cannot be applied together.')
+        throw new Error('Grid behaviour with looping and isContinuous cannot be applied together.');
       }
     },
     focus() {
-      this.$trigger('focused')
-      this.scrollToFocusedItem()
+      this.$trigger('focused');
+      this.scrollToFocusedItem();
     },
   },
   methods: {
@@ -155,87 +155,90 @@ const Grid = Blits.Component('Grid', {
         this._scrollY = (focusedRow - visibleRows + 1) * this.totalHeight;
       }
 
-      const maxScroll = Math.max(0, (Math.ceil(this.items.length / columns) - visibleRows) * this.totalHeight);
+      const maxScroll = Math.max(
+        0,
+        (Math.ceil(this.items.length / columns) - visibleRows) * this.totalHeight
+      );
       this._scrollY = Math.min(maxScroll, Math.max(0, this._scrollY));
     },
   },
   watch: {
     focusIndex() {
       this.focused = this.focusIndex || 0;
-      this.$trigger('focused')
+      this.$trigger('focused');
     },
     focused(value: number) {
       if (!this.items[value]) return;
-      const focusItem = this.$select(`grid-item-${this.items[value].id}`)
+      const focusItem = this.$select(`grid-item-${this.items[value].id}`);
       if (focusItem?.$focus) {
-        focusItem.$focus()
-        this.scrollToFocusedItem()
+        focusItem.$focus();
+        this.scrollToFocusedItem();
       }
     },
   },
   input: {
     up(e: any) {
-      const columns = this.gridColumns
-      const previousIndex = this.focused - columns
+      const columns = this.gridColumns;
+      const previousIndex = this.focused - columns;
 
       if (previousIndex >= 0) {
-        this.focused = previousIndex
+        this.focused = previousIndex;
       } else if (this.looping) {
-        const lastRow = this.items.length - (this.items.length % columns)
-        const lastRowColumn = lastRow + (this.focused % columns)
-        this.focused = lastRowColumn < this.items.length ? lastRowColumn : lastRowColumn - columns
+        const lastRow = this.items.length - (this.items.length % columns);
+        const lastRowColumn = lastRow + (this.focused % columns);
+        this.focused = lastRowColumn < this.items.length ? lastRowColumn : lastRowColumn - columns;
       } else if (this.refocusParent) {
-        this.parent.$focus(e)
+        this.parent.$focus(e);
       }
     },
     down(e: any) {
-      const columns = this.gridColumns
-      const nextIndex = this.focused + columns
+      const columns = this.gridColumns;
+      const nextIndex = this.focused + columns;
 
       if (nextIndex < this.items.length) {
-        this.focused = nextIndex
+        this.focused = nextIndex;
       } else if (this.looping) {
-        this.focused = nextIndex % columns
+        this.focused = nextIndex % columns;
       } else if (this.refocusParent) {
-        this.parent.$focus(e)
+        this.parent.$focus(e);
       }
     },
     left(e: any) {
-      const columns = this.gridColumns
-      const isNotFirstInRow = this.focused % columns > 0
-      const isWithinBounds = this.focused + columns - 1 < this.items.length
-      const isNotFirst = this.focused > 0
+      const columns = this.gridColumns;
+      const isNotFirstInRow = this.focused % columns > 0;
+      const isWithinBounds = this.focused + columns - 1 < this.items.length;
+      const isNotFirst = this.focused > 0;
 
       if (isNotFirstInRow) {
-        this.focused -= 1
+        this.focused -= 1;
       } else if (this.looping) {
-        this.focused = isWithinBounds ? this.focused + columns - 1 : this.items.length - 1
-      } else if(this.isContinuous) {
-        this.focused = isNotFirst ? this.focused - 1 : this.items.length - 1
+        this.focused = isWithinBounds ? this.focused + columns - 1 : this.items.length - 1;
+      } else if (this.isContinuous) {
+        this.focused = isNotFirst ? this.focused - 1 : this.items.length - 1;
       } else if (this.refocusParent) {
-        this.parent.$focus(e)
+        this.parent.$focus(e);
       }
     },
     right(e: any) {
-      const columns = this.gridColumns
-      const isNotLastInRow = this.focused % columns < columns - 1
-      const isNotLastItem = this.focused < this.items.length - 1
+      const columns = this.gridColumns;
+      const isNotLastInRow = this.focused % columns < columns - 1;
+      const isNotLastItem = this.focused < this.items.length - 1;
 
       if (isNotLastInRow && isNotLastItem) {
-        this.focused += 1
+        this.focused += 1;
       } else if (this.looping) {
-        const index = this.focused - columns + 1
-        this.focused = isNotLastItem ? index : Math.floor(this.focused / columns) * columns
-      } else if(this.isContinuous) {
-        this.focused = isNotLastItem ? this.focused + 1 : 0
+        const index = this.focused - columns + 1;
+        this.focused = isNotLastItem ? index : Math.floor(this.focused / columns) * columns;
+      } else if (this.isContinuous) {
+        this.focused = isNotLastItem ? this.focused + 1 : 0;
       } else if (this.refocusParent) {
-        this.parent.$focus(e)
+        this.parent.$focus(e);
       }
     },
     enter() {
-      console.log('Selected item:', this.items[this.focused])
+      console.log('Selected item:', this.items[this.focused]);
     },
   },
-})
+});
 
-export default Grid as unknown as ReturnType<typeof Blits.Component>
+export default Grid as unknown as ReturnType<typeof Blits.Component>;

@@ -33,7 +33,12 @@ export default Blits.Component('Home', {
             isContinuous="true"
           />
       </Element>
-      <Zap :alpha.transition="{value: $zapTo.length > 0 ? 1 : 0, duration: 500}" :zapTo="$zapTo" placement="center" y="100" />
+      <Zap
+        :alpha.transition="{value: $zapTo.length > 0 ? 1 : 0, duration: 500}"
+        :zapTo="$zapTo"
+        placement="center"
+        y="100"
+      />
     </Element>`,
   state() {
     return {
@@ -93,8 +98,6 @@ export default Blits.Component('Home', {
   },
   input: {
     any(ev) {
-      console.log('Key pressed:', ev.key);
-
       // Check if the key is a digit (0-9)
       if (/^\d$/.test(ev.key)) {
         const zapToDigit = parseInt(ev.key, 10);
@@ -104,10 +107,9 @@ export default Blits.Component('Home', {
         }
 
         this.zapTimeoutId = this.$setTimeout(() => {
-          console.log('timeout zap!');
           const zapToIndex = this.zapTo === '0' ? 0 : parseInt(this.zapTo) - 1;
+          
           this.gridFocusIndex = zapToIndex;
-          console.log('GRID FOCUS INDEX ', this.gridFocusIndex);
           this.zapTimeoutId = null;
           this.zapTo = '';
           this.focusGrid();
@@ -118,12 +120,6 @@ export default Blits.Component('Home', {
         }
 
         this.zapTo += `${zapToDigit}`;
-        console.log('...', this.zapTo);
-        console.log(`Numeric key ${zapToDigit} was pressed`);
-
-        // You can now use the digit variable which will be a number from 0-9
-        // For example, to focus a specific item in your grid:
-        // this.$select('grid').$setFocus(digit - 1); // Convert to 0-based index if needed
       }
     },
   },

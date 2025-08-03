@@ -1,45 +1,73 @@
-# fredir
+# Fredir - Smart TV Redirect App
 
-### fredir
+A lightweight web application built with LightningJS and Blits Smart TV Framework, designed specifically for Smart TVs to handle URL redirections with a user-friendly interface.
 
+![Fredir Screenshot](public/assets/home.jpeg)
 
-Welcome to the _fredir_ Lightning 3 Blits App!
+## Features
 
-### Getting started
+- Simple and intuitive navigation optimized for TV remote controls
+- Customizable redirect links
+- Built specifically for Smart TV experiences
+- Easy setup and configuration
 
-Follow the steps below to get your Lightning 3 Blits App up and running in no time.
+## Getting Started
 
-#### IDE setup
+### Prerequisites
 
-It is highly recommended to install the Blits [VS-code extension](https://marketplace.visualstudio.com/items?itemName=LightningJS.lightning-blits) which will give you template highlighting and improved autocompletion.
+- Node.js (v14 or higher)
+- npm or yarn
 
-#### Project setup
+### Installation
 
-Run the following command to install the dependencies of your App:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/froma-dev/fredir.git
+   cd fredir
+   ```
 
-```sh
-npm install
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+## Configuration
+
+Edit the `public/redirs/redirects.json` file to add or modify your redirect links. The format should be:
+
+```json
+[
+  {
+    "id": 1,
+    "title": "React",
+    "url": "https://reactjs.org"
+  },
+  {
+    "id": 2,
+    "title": "Vue.js",
+    "url": "https://vuejs.org"
+  }
+]
 ```
 
-#### Build and run in development mode
+## Building for Production
 
-Run your App in development mode:
+To create a production build:
 
-```sh
-npm run dev
-```
-
-This command uses Vite to fire up a local server, with Hot Reloading support. Visit the provided link in your web browser to see the App in action.
-
-#### Build the App for production
-
-Create an optimized and minified version of your App:
-
-```sh
+```bash
 npm run build
+# or
+yarn build
 ```
-
-This will create a production version of the app in the `dist` folder.
 
 ## Caveats
 ### Blocked request
@@ -48,11 +76,12 @@ When using local DNS such as ```local.me.dev:5173``` you will get a blocked requ
 Blocked request. This host("local.me.dev") is not allowed. To allow this host, add "local.me.dev" to server.allowedHosts in vite.config.js
 ```
 
+## Technologies Used
 
+- LightningJS
+- Blits Smart TV Framework
+- TypeScript
 
+## License
 
-### Resources
-
-- [Blits documentation](https://lightningjs.io/v3-docs/blits/getting_started/intro.html) - official documentation
-- [Blits Example App](https://blits-demo.lightningjs.io/?source=true) - a great reference to learn by example
-- [Blits Components](https://lightningjs.io/blits-components.html) - off-the-shelf, basic and performant reference components
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

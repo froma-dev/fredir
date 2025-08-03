@@ -6,11 +6,14 @@
   "type": "module",
   "scripts": {
     "start": "npm run dev",
-    "lint": "eslint '**/*.js'",
-    "lint:fix": "eslint '**/*.js' --fix",
+    "lint": "eslint '**/*.{js,ts}'",
+    "lint:fix": "eslint '**/*.{js,ts}' --fix",
+    "format": "prettier --write '**/*.{js,ts,tsx,json}'",
     "build": "vite build",
     "dev": "vite dev --host",
-    "postinstall": "husky"
+    "postinstall": "husky",
+    "prettier:check": "prettier --check '**/*.{js,ts,tsx,json}'",
+    "prettier:fix": "prettier --write '**/*.{js,ts,tsx,json}'"
   },
   "devDependencies": {
     "vite": "^5.4.8",

@@ -5,7 +5,9 @@ export interface RedirectionItem {
   index?: number;
 }
 
-export async function fetchRedirections(url: string = '/redirs/redirects.json'): Promise<RedirectionItem[]> {
+export async function fetchRedirections(
+  url: string = '/redirs/redirects.json'
+): Promise<RedirectionItem[]> {
   try {
     const response = await fetch(url);
 
@@ -18,7 +20,7 @@ export async function fetchRedirections(url: string = '/redirs/redirects.json'):
     // Ensure each item has an index if not provided
     return data.map((item, index) => ({
       ...item,
-      index: item.index ?? index
+      index: item.index ?? index,
     }));
   } catch (error) {
     console.error('Error fetching redirections:', error);

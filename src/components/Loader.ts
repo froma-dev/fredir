@@ -1,5 +1,4 @@
-import Blits from '@lightningjs/blits'
-
+import Blits from '@lightningjs/blits';
 
 export default Blits.Component('Loader', {
   template: `
@@ -16,11 +15,11 @@ export default Blits.Component('Loader', {
        * Alpha of the circles, used to create a fade-in / fade-out transition
        */
       alpha: 0 as number,
-    }
+    };
   },
   hooks: {
     ready() {
-      this.start()
+      this.start();
     },
   },
   methods: {
@@ -29,8 +28,8 @@ export default Blits.Component('Loader', {
      */
     start(): void {
       this.$setInterval(() => {
-        this.alpha = this.alpha === 1 ? 0 : 1
-      }, 800)
+        this.alpha = this.alpha === 1 ? 0 : 1;
+      }, 800);
     },
   },
-})
+});

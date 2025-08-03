@@ -1,8 +1,8 @@
-import Blits from "@lightningjs/blits";
-import colors from "../../utils/colors";
+import Blits from '@lightningjs/blits';
+import colors from '../../utils/colors';
 
 const zapToOffset = 20;
-export default Blits.Component("Zap", {
+export default Blits.Component('Zap', {
   template: `
     <Element
       :w="$w"
@@ -19,24 +19,24 @@ export default Blits.Component("Zap", {
       />
     </Element>
   `,
-  props: ["zapTo"],
+  props: ['zapTo'],
   state() {
     return {
       backgroundColor: colors.gray[900],
       fontColor: colors.gray[400],
-      textSize: "54"
-    }
+      textSize: '54',
+    };
   },
   methods: {
     onZapToTextLoaded(ev) {
       const textWidth = ev.w;
       this.w = textWidth + zapToOffset;
       this.backgroundColor = colors.gray[900];
-    }
+    },
   },
   input: {
     any(event) {
-      console.log('-------', event)
-    }
-  }
-})
+      console.log('-------', event);
+    },
+  },
+});

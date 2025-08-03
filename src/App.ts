@@ -1,6 +1,6 @@
-import Blits from '@lightningjs/blits'
+import Blits from '@lightningjs/blits';
 
-import Home from './pages/Home'
+import Home from './pages/Home';
 
 export default Blits.Application({
   template: `
@@ -8,4 +8,4 @@ export default Blits.Application({
       <RouterView />
     </Element>`,
   routes: [{ path: '/', component: Home }],
-})
+});

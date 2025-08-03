@@ -1,7 +1,7 @@
-import Blits from "@lightningjs/blits";
-import colors from "../../utils/colors";
+import Blits from '@lightningjs/blits';
+import colors from '../../utils/colors';
 
-export default Blits.Component("Header", {
+export default Blits.Component('Header', {
   template: `
     <Element
       w="$width"
@@ -12,7 +12,7 @@ export default Blits.Component("Header", {
       <Text placement="{x: 'center', y: 'middle'}" content="$title" size="40" color="$fontColor" />
     </Element>
   `,
-  props: ["title", "brand"],
+  props: ['title', 'brand'],
   state() {
     return {
       backgroundColor: colors.gray[800],

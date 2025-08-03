@@ -163,9 +163,9 @@ const Grid = Blits.Component('Grid', {
     },
   },
   watch: {
-    focusIndex() {
-      this.focused = this.focusIndex || 0;
-      this.$trigger('focused');
+    focusIndex(focusIndex: number) {
+      this.focused = focusIndex;
+      this.scrollToFocusedItem();
     },
     focused(value: number) {
       if (!this.items[value]) return;
@@ -237,9 +237,6 @@ const Grid = Blits.Component('Grid', {
     },
     enter() {
       console.log('Selected item:', this.items[this.focused]);
-    },
-    back(e) {
-      console.log('on back', e);
     },
   },
 });

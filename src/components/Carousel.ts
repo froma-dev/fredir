@@ -48,7 +48,6 @@ export default Blits.Component("Carousel", {
   watch: {
     focused(value: number) {
       const focusItem = this.$select(`item${value}`);
-      console.log('---->',focusItem, value)
       if (focusItem && focusItem.$focus) {
         focusItem.$focus();
         if (value < 1) {
@@ -63,7 +62,6 @@ export default Blits.Component("Carousel", {
   },
   input: {
     left() {
-      console.log("left");
       if (this.focused > 0) {
         this.focused--;
       } else {
@@ -71,7 +69,6 @@ export default Blits.Component("Carousel", {
       }
     },
     right() {
-      console.log("right");
       if (this.focused < this.items.length - 1) {
         this.focused++;
       } else {

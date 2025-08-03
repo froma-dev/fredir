@@ -4,8 +4,13 @@ import Loader from '../components/Loader';
 import colors from '../utils/colors';
 import Header from '../components/Header/Header';
 import Grid from '../components/Grid/Grid';
-import Zap from '../components/Zap/Zap';
+import Zap, {
+  DEFAULT_ZAP_TIMEOUT_MS,
+  DEFAULT_ZAP_TO_LENGTH,
+  ZAP_TO_NOT_FOUND_TEXT,
+} from '../components/Zap/Zap';
 import { fetchRedirections, type RedirectionItem } from '../services/redirs';
+import { isStringDigit, parseStringDigit } from '../utils/numberUtils';
 
 export default Blits.Component('Home', {
   components: {
@@ -17,7 +22,7 @@ export default Blits.Component('Home', {
   },
   template: `
     <Element :w="$$appState.w" :h="$$appState.h" color="$backgroundColor">
-    <Header brand="assets/thunda.svg" title="fRedir - Smart Redirects" />
+    <Header brand="assets/thunda.svg" title="FRedir - SmartTV Redirects" />
       <Element :y.transition="$y">
         <Loader :x="$$appState.w / 2" mount="{x: 0.5}" y="600" w="160" :alpha.transition="$loaderAlpha" />
           <!--<Carousel ref="carousel" :items="$items" title="Redirects" />-->
@@ -34,7 +39,7 @@ export default Blits.Component('Home', {
           />
       </Element>
       <Zap
-        :alpha.transition="{value: $zapTo.length > 0 ? 1 : 0, duration: 500}"
+        :alpha.transition="{value: $isZapVisible ? 1 : 0, duration: 500}"
         :zapTo="$zapTo"
         placement="center"
         y="100"
@@ -63,6 +68,7 @@ export default Blits.Component('Home', {
       zapTimeoutId: null as number | null,
       zapTo: '' as string,
       gridFocusIndex: 0,
+      isZapVisible: false,
     };
   },
   hooks: {
@@ -95,31 +101,57 @@ export default Blits.Component('Home', {
       const focusItem = this.$select('grid');
       if (focusItem && focusItem.$focus) focusItem.$focus();
     },
-  },
-  input: {
-    any(ev) {
-      // Check if the key is a digit (0-9)
-      if (/^\d$/.test(ev.key)) {
-        const zapToDigit = parseInt(ev.key, 10);
+    hideZap() {
+      this.isZapVisible = false;
+      this.zapTimeoutId = null;
+      this.zapTo = '';
+    },
+    showZap() {
+      this.isZapVisible = true;
+    },
+    startZapTo(key: string) {
+      const zapToDigit = parseStringDigit(key);
+      this.showZap();
 
+      // Reset zap to digit if it's longer than 4 or previous text was not found.
+      if (this.zapTo.length === DEFAULT_ZAP_TO_LENGTH || this.zapTo === ZAP_TO_NOT_FOUND_TEXT) {
+        this.zapTo = '';
+      }
+
+      this.zapTo += `${zapToDigit}`;
+
+      this.startZapToTimeout().then(() => {
+        const zapToIndex = this.zapTo === '0' ? 0 : parseStringDigit(this.zapTo) - 1;
+
+        // Check if the item is out of boundaries.
+        if (zapToIndex > this.items.length) {
+          this.zapTo = ZAP_TO_NOT_FOUND_TEXT;
+          this.startZapToTimeout().then(() => this.hideZap());
+          return;
+        }
+
+        // update to the new focus index
+        this.gridFocusIndex = zapToIndex;
+        this.hideZap();
+      });
+    },
+    startZapToTimeout() {
+      return new Promise<void>((resolve) => {
         if (this.zapTimeoutId) {
           this.$clearTimeout(this.zapTimeoutId);
         }
 
         this.zapTimeoutId = this.$setTimeout(() => {
-          const zapToIndex = this.zapTo === '0' ? 0 : parseInt(this.zapTo) - 1;
-          
-          this.gridFocusIndex = zapToIndex;
-          this.zapTimeoutId = null;
-          this.zapTo = '';
-          this.focusGrid();
-        }, 4000);
-
-        if (this.zapTo.length === 4) {
-          this.zapTo = '';
-        }
-
-        this.zapTo += `${zapToDigit}`;
+          resolve();
+        }, DEFAULT_ZAP_TIMEOUT_MS);
+      });
+    },
+  },
+  input: {
+    any(ev) {
+      // Check if the key is a digit (0-9)
+      if (isStringDigit(ev.key)) {
+        this.startZapTo(ev.key);
       }
     },
   },

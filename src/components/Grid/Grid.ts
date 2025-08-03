@@ -1,5 +1,5 @@
 import Blits from '@lightningjs/blits';
-import Item from '../CarouselItem';
+import Item from '../RedirItem';
 
 interface GridState {
   focused: number;

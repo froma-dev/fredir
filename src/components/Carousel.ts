@@ -1,5 +1,5 @@
 import Blits from "@lightningjs/blits";
-import CarouselItem from "./CarouselItem";
+import CarouselItem from "./RedirItem";
 import colors from "../utils/colors";
 
 const w = 600;
